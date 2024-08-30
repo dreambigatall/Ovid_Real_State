@@ -6,6 +6,9 @@ import {useCities} from "../contexts/CitiesContext"
 import { useGeolocation } from '../hooks/useGeolocation';
 import Button from './Button'
 import MarkerClusterGroup from 'react-leaflet-cluster';
+const BASE_URL = "https://api.bigdatacloud.net/data/reverse-geocode-client";
+
+
 export default function Map() {
   
   const [serChParams, setSearchParams]=useSearchParams();
@@ -13,10 +16,11 @@ export default function Map() {
   const lng=serChParams.get("lng");
   const{cities}=useCities();
   const [mapPosition,setMapPosition]=useState([40,0]);
-  const{isLoading:isLoadingPosition, position:geolocationPosition, getPosition, error}=useGeolocation();
+  const{isLoading:isLoadingPosition, position:geolocationPosition, getPosition, error, city}=useGeolocation();
   const [showPopup, setShowPopup] = useState(false);
- 
-  
+   //const[mycity,setMycity]=useState();
+  //const [isload, setIsload]=useState(false);
+  //const[isError, setIsError]=useState();
   useEffect(function(){
      if(lat && lng)setMapPosition([lat,lng])
      },[lat,lng]);
@@ -33,6 +37,31 @@ export default function Map() {
       setShowPopup(true); // Show the popup after fetching the position
     };
 
+   /* useEffect(function(){
+      //if(!geolocationPosition.lat && !geolocationPosition.lng) return ;
+       
+      async function mycityfetcher(){
+        try{   setIsload(true);
+              const res=await fetch(`${BASE_URL}?latitude=${lat}&longtiude=${lng}`);
+              if(!res.ok) throw new Error("there is an error to fech your city");
+              const data=res.json();
+              setMycity(data.city || data.locality || "");
+              console.log(data)
+        }catch(err){
+          setIsError(err);
+
+        }finally{
+          setIsload(false);
+
+        }
+      }
+
+    mycityfetcher();
+
+
+    },[lat,lng])
+
+*/
   return (
 
     <div className={styles.mapContainer}>
@@ -44,6 +73,8 @@ export default function Map() {
           <h3>Your Location</h3>
           <p>Latitude: {geolocationPosition.lat}</p>
           <p>Longitude: {geolocationPosition.lng}</p>
+          <p>{city}</p>
+          
           <button onClick={() => setShowPopup(false)}>Close</button>
         </div>
       )}
